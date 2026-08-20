@@ -6,7 +6,7 @@
 
 It provides authenticated users with a personal workspace where they can create, organize, edit, and manage notes with support for **nested notes**, **automatic saving**, **dark-only UI**, and a **responsive mobile experience**.
 
-🌐 **Live Application:** https://jisnote.vercel.app/?utm_source=chatgpt.com
+🌐 **Live Application:** https://jisnote.vercel.app/dashboard
 
 📦 **GitHub Repository:** https://github.com/mjishaan59-cell/JisNote
 
@@ -348,6 +348,6 @@ JisNote is deployed on **Vercel**.
 
 ### Production URL
 
-**https://jisnote.vercel.app/?utm_source=chatgpt.com**
+**https://jisnote.vercel.app/dashboard**
 
 The project can be connected to a Git repository so that changes pushed to the production branch automatically deploy.
