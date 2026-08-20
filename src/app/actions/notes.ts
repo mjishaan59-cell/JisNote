@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
-export async function createNote() {
+export async function createNote(parentId?: string) {
   const supabase = await createClient();
 
   const {
@@ -14,12 +14,29 @@ export async function createNote() {
     throw new Error("Unauthorized");
   }
 
+  // If creating a child note, make sure the parent
+  // belongs to the currently authenticated user.
+  if (parentId) {
+    const { data: parentNote, error: parentError } =
+      await supabase
+        .from("notes")
+        .select("id")
+        .eq("id", parentId)
+        .eq("user_id", user.id)
+        .single();
+
+    if (parentError || !parentNote) {
+      throw new Error("Parent note not found or unauthorized");
+    }
+  }
+
   const { data, error } = await supabase
     .from("notes")
     .insert({
       user_id: user.id,
       title: "Untitled",
       content: [],
+      parent_id: parentId ?? null,
     })
     .select("id")
     .single();
@@ -29,6 +46,10 @@ export async function createNote() {
   }
 
   revalidatePath("/dashboard");
+
+  if (parentId) {
+    revalidatePath(`/notes/${parentId}`);
+  }
 
   return data;
 }
@@ -46,7 +67,10 @@ export async function getNotes() {
 
   const { data, error } = await supabase
     .from("notes")
-    .select("id, title, parent_id, created_at, updated_at")
+    .select(
+      "id, title, parent_id, created_at, updated_at"
+    )
+    .eq("user_id", user.id)
     .order("updated_at", { ascending: false });
 
   if (error) {
