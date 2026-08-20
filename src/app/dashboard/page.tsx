@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { getNotes } from "@/app/actions/notes";
 import { createClient } from "@/lib/supabase/server";
 import Workspace from "@/components/Workspace";
@@ -9,12 +10,18 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Protect the dashboard.
+  // If there is no authenticated user, send them to login.
+  if (!user) {
+    redirect("/login");
+  }
+
   const notes = await getNotes();
 
   return (
     <Workspace
       notes={notes}
-      email={user?.email ?? null}
+      email={user.email ?? null}
     >
       <div className="flex min-h-full items-center justify-center px-6">
         <div className="text-center">

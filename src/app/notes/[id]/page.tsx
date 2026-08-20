@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getNotes, getNote } from "@/app/actions/notes";
 import { createClient } from "@/lib/supabase/server";
 import Workspace from "@/components/Workspace";
@@ -23,6 +23,11 @@ export default async function NotePage({
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Protect individual notes.
+  if (!user) {
+    redirect("/login");
+  }
+
   const [note, notes] = await Promise.all([
     getNote(id),
     getNotes(),
@@ -35,7 +40,7 @@ export default async function NotePage({
   return (
     <Workspace
       notes={notes}
-      email={user?.email ?? null}
+      email={user.email ?? null}
     >
       <div className="mx-auto w-full max-w-5xl px-6 py-10 md:px-10 md:py-12">
         <div className="mb-6 flex items-start justify-between gap-4">
